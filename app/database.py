@@ -135,8 +135,7 @@ class DatabaseManager:
                 ]
 
             if year:
-                query["year"] = year
-
+                query["year"] = {"$regex": year, "$options": "i"}
             if text_search:
                 # Use comprehensive text search across all fields
                 query["$or"] = [

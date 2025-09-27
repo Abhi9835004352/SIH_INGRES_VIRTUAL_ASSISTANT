@@ -1,26 +1,29 @@
 import pandas as pd
-import numpy as np
 from typing import List, Dict, Any
-import os
 from pathlib import Path
 import asyncio
-from bs4 import BeautifulSoup
-import PyPDF2
-import json
-import re
-from .models import GroundWaterData, TextChunk
+import logging
+from langchain.schema import Document
+from langchain_community.document_loaders import PyPDFLoader, BSHTMLLoader, CSVLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from .models import GroundWaterData
 from .database import db_manager
 from .vector_store import vector_store
-import logging
 
 logger = logging.getLogger(__name__)
 
 
 class DataPreprocessor:
-    def __init__(self, data_dir: str = "data"):
-        self.data_dir = Path(data_dir)
+    def __init__(self, data_dir: str = None):
+        if data_dir is None:
+            # Default to data directory relative to this file's location
+            base_dir = Path(__file__).parent.parent
+            self.data_dir = base_dir / "data"
+        else:
+            self.data_dir = Path(data_dir)
         self.raw_dir = self.data_dir / "raw"
         self.structured_dir = self.data_dir / "structure_tables"
+        self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
 
     async def process_all_data(self):
         """Process all data and populate databases"""
@@ -30,12 +33,16 @@ class DataPreprocessor:
         groundwater_data = await self.process_structured_data()
         if groundwater_data:
             await db_manager.store_groundwater_data(groundwater_data)
+            
+            # Also create documents for vector store from structured data
+            structured_documents = self._create_documents_from_structured_data(groundwater_data)
+            vector_store.add_documents(structured_documents)
+            logger.info(f"Added {len(structured_documents)} structured data documents to vector store")
 
         # Process unstructured data
-        text_chunks = await self.process_unstructured_data()
-        if text_chunks:
-            await db_manager.store_text_chunks(text_chunks)
-            vector_store.add_documents(text_chunks)
+        documents = await self.process_unstructured_data()
+        if documents:
+            vector_store.add_documents(documents)
             vector_store.save_index()
 
         logger.info("Data preprocessing completed")
@@ -60,29 +67,109 @@ class DataPreprocessor:
         excel_files = list(self.structured_dir.glob("*.xlsx"))
         for excel_file in excel_files:
             try:
-                # Read all sheets
-                excel_data = pd.read_excel(excel_file, sheet_name=None)
-                for sheet_name, df in excel_data.items():
-                    data = self._process_excel_sheet(df, str(excel_file), sheet_name)
-                    groundwater_data.extend(data)
-                    logger.info(
-                        f"Processed {len(data)} records from {excel_file.name} - {sheet_name}"
-                    )
+                df = pd.read_excel(excel_file)
+                data = self._process_groundwater_excel(df, str(excel_file))
+                groundwater_data.extend(data)
+                logger.info(f"Processed {len(data)} records from {excel_file.name}")
             except Exception as e:
                 logger.error(f"Error processing {excel_file}: {e}")
 
         return groundwater_data
+
+    def _process_groundwater_excel(self, df: pd.DataFrame, source: str) -> List[GroundWaterData]:
+        """Process groundwater data from Excel"""
+        data = []
+        
+        # Find header row (usually contains "S.No" and "STATE")
+        header_row_index = -1
+        for i, row in df.iterrows():
+            row_str = ' '.join([str(cell) for cell in row if pd.notna(cell)])
+            if "S.No" in row_str and "STATE" in row_str:
+                header_row_index = i
+                break
+
+        if header_row_index == -1:
+            logger.warning(f"Could not find header row in {source}")
+            return data
+
+        # Start processing data from the row after headers (skip potential sub-headers)
+        data_start_row = header_row_index + 3
+        
+        # Extract data
+        for i in range(data_start_row, len(df)):
+            try:
+                row = df.iloc[i]
+                
+                # Get state name from column 1 (usually the STATE column)
+                state = row.iloc[1] if len(row) > 1 else None
+                if pd.isna(state) or str(state).strip() == "":
+                    continue
+                
+                state_str = str(state).strip().upper()
+                
+                # Skip total/summary rows
+                if any(keyword in state_str.lower() for keyword in ['total', 'grand', 'sum', 'all']):
+                    continue
+                
+                # Extract rainfall (usually around column 5-6)
+                rainfall = 0.0
+                for col_idx in [5, 6, 7]:
+                    if col_idx < len(row) and pd.notna(row.iloc[col_idx]):
+                        rainfall = self._clean_numeric(row.iloc[col_idx])
+                        if rainfall > 0:
+                            break
+                
+                # For extraction and resources, we need to look at the right columns
+                # Based on our analysis, extraction might be around column 66, resources around 90
+                # But let's also look for the "Total Ground Water Availability" which was in column 151
+                extraction = 0.0
+                resources = 0.0
+                
+                # Look for ground water availability (this was in column 151 for Delhi)
+                if len(row) > 151 and pd.notna(row.iloc[151]):
+                    resources = self._clean_numeric(row.iloc[151])
+                
+                # If we don't have resources from column 151, try other columns
+                if resources == 0:
+                    for col_idx in [90, 91, 92]:
+                        if col_idx < len(row) and pd.notna(row.iloc[col_idx]):
+                            resources = self._clean_numeric(row.iloc[col_idx])
+                            if resources > 0:
+                                break
+                
+                # For extraction, try multiple columns
+                for col_idx in [66, 67, 68]:
+                    if col_idx < len(row) and pd.notna(row.iloc[col_idx]):
+                        extraction = self._clean_numeric(row.iloc[col_idx])
+                        if extraction > 0:
+                            break
+                
+                # If we have valid data, create a record
+                if rainfall > 0 or extraction > 0 or resources > 0:
+                    groundwater_record = GroundWaterData(
+                        state=state_str,
+                        rainfall_mm=rainfall,
+                        ground_water_extraction_ham=extraction,
+                        annual_extractable_ground_water_resources_ham=resources,
+                        url=source,
+                        year="2023-2024",
+                    )
+                    data.append(groundwater_record)
+                    
+            except Exception as e:
+                logger.warning(f"Error processing row {i} in {source}: {e}")
+                continue
+                
+        logger.info(f"Extracted {len(data)} records from Excel file {source}")
+        return data
+
 
     def _process_groundwater_csv(
         self, df: pd.DataFrame, source: str
     ) -> List[GroundWaterData]:
         """Process groundwater data from CSV"""
         data = []
-
-        # Clean column names
         df.columns = df.columns.str.strip()
-
-        # Expected columns for groundwater data
         required_columns = [
             "STATE",
             "Rainfall (mm)",
@@ -93,7 +180,6 @@ class DataPreprocessor:
         if all(col in df.columns for col in required_columns):
             for _, row in df.iterrows():
                 try:
-                    # Clean numeric values (remove commas)
                     rainfall = self._clean_numeric(row["Rainfall (mm)"])
                     extraction = self._clean_numeric(
                         row["Ground Water Extraction (ham)"]
@@ -114,161 +200,36 @@ class DataPreprocessor:
                 except Exception as e:
                     logger.warning(f"Error processing row: {e}")
                     continue
-
         return data
 
-    def _process_excel_sheet(
-        self, df: pd.DataFrame, source: str, sheet_name: str
-    ) -> List[GroundWaterData]:
-        """Process Excel sheet data"""
-        # Similar logic to CSV processing but adapted for Excel format
-        data = []
-
-        # Try to identify data structure
-        if df.empty:
-            return data
-
-        # Look for state/location information
-        for _, row in df.iterrows():
-            try:
-                # Extract meaningful data from each row
-                # This is a generic processor - adjust based on actual Excel structure
-                row_dict = row.to_dict()
-
-                # Create text chunk for unstructured data from Excel
-                content = f"Sheet: {sheet_name}\n"
-                for key, value in row_dict.items():
-                    if pd.notna(value):
-                        content += f"{key}: {value}\n"
-
-                # Create text chunk for vector search
-                text_chunk = TextChunk(
-                    content=content,
-                    source=source,
-                    source_type="xlsx",
-                    metadata={
-                        "sheet_name": sheet_name,
-                        "row_data": {
-                            k: str(v) for k, v in row_dict.items() if pd.notna(v)
-                        },
-                    },
-                )
-
-                # Store as text chunk instead of structured data for Excel files
-                # unless we can identify specific groundwater data structure
-
-            except Exception as e:
-                logger.warning(f"Error processing Excel row: {e}")
-                continue
-
-        return data
-
-    async def process_unstructured_data(self) -> List[TextChunk]:
+    async def process_unstructured_data(self) -> List[Document]:
         """Process PDFs, HTML, and other unstructured data"""
         logger.info("Processing unstructured data...")
-        text_chunks = []
+        documents = []
 
         # Process HTML files
         html_files = list(self.raw_dir.rglob("*.html"))
         for html_file in html_files:
-            chunks = self._process_html_file(html_file)
-            text_chunks.extend(chunks)
-            logger.info(f"Processed {len(chunks)} chunks from {html_file.name}")
+            loader = BSHTMLLoader(str(html_file))
+            docs = loader.load()
+            documents.extend(self.text_splitter.split_documents(docs))
+            logger.info(f"Processed {len(docs)} chunks from {html_file.name}")
 
         # Process PDF files
         pdf_files = list(self.raw_dir.rglob("*.pdf"))
         for pdf_file in pdf_files:
-            chunks = self._process_pdf_file(pdf_file)
-            text_chunks.extend(chunks)
-            logger.info(f"Processed {len(chunks)} chunks from {pdf_file.name}")
+            loader = PyPDFLoader(str(pdf_file))
+            docs = loader.load()
+            documents.extend(self.text_splitter.split_documents(docs))
+            logger.info(f"Processed {len(docs)} chunks from {pdf_file.name}")
 
-        return text_chunks
-
-    def _process_html_file(self, file_path: Path) -> List[TextChunk]:
-        """Extract and chunk text from HTML files"""
-        chunks = []
-        try:
-            with open(file_path, "r", encoding="utf-8") as f:
-                content = f.read()
-
-            soup = BeautifulSoup(content, "html.parser")
-
-            # Extract FAQ items (based on the structure seen)
-            faq_items = soup.find_all("div", class_="card")
-
-            for i, faq_item in enumerate(faq_items):
-                question_elem = faq_item.find("button")
-                answer_elem = faq_item.find("div", class_="card-body")
-
-                if question_elem and answer_elem:
-                    question = question_elem.get_text(strip=True)
-                    answer = answer_elem.get_text(strip=True)
-
-                    content = f"Q: {question}\nA: {answer}"
-
-                    chunk = TextChunk(
-                        content=content,
-                        source=str(file_path),
-                        source_type="html",
-                        metadata={
-                            "question": question,
-                            "answer": answer,
-                            "faq_index": i,
-                            "source_file": file_path.name,
-                        },
-                    )
-                    chunks.append(chunk)
-
-        except Exception as e:
-            logger.error(f"Error processing HTML file {file_path}: {e}")
-
-        return chunks
-
-    def _process_pdf_file(self, file_path: Path) -> List[TextChunk]:
-        """Extract and chunk text from PDF files"""
-        chunks = []
-        try:
-            with open(file_path, "rb") as f:
-                reader = PyPDF2.PdfReader(f)
-
-                full_text = ""
-                for page_num, page in enumerate(reader.pages):
-                    text = page.extract_text()
-                    full_text += text + "\n"
-
-                # Split into chunks (approximately 1000 characters each)
-                chunk_size = 1000
-                overlap = 200
-
-                for i in range(0, len(full_text), chunk_size - overlap):
-                    chunk_text = full_text[i : i + chunk_size]
-
-                    if len(chunk_text.strip()) > 50:  # Only include substantial chunks
-                        chunk = TextChunk(
-                            content=chunk_text.strip(),
-                            source=str(file_path),
-                            source_type="pdf",
-                            metadata={
-                                "chunk_index": i // (chunk_size - overlap),
-                                "source_file": file_path.name,
-                                "total_pages": len(reader.pages),
-                            },
-                        )
-                        chunks.append(chunk)
-
-        except Exception as e:
-            logger.error(f"Error processing PDF file {file_path}: {e}")
-
-        return chunks
+        return documents
 
     def _clean_numeric(self, value: str) -> float:
         """Clean and convert numeric strings to float"""
         if pd.isna(value):
             return 0.0
-
-        # Convert to string and remove commas
         clean_value = str(value).replace(",", "").strip()
-
         try:
             return float(clean_value)
         except (ValueError, TypeError):
@@ -287,6 +248,47 @@ class DataPreprocessor:
             },
         }
         return stats
+
+    def _create_documents_from_structured_data(self, groundwater_data: List[GroundWaterData]) -> List[Document]:
+        """Create documents from structured groundwater data for vector store"""
+        documents = []
+        
+        for data in groundwater_data:
+            # Create comprehensive content about each state's groundwater data
+            content = f"""
+State: {data.state}
+Year: {data.year}
+
+Groundwater Information for {data.state}:
+- Annual Rainfall: {data.rainfall_mm} mm
+- Ground Water Extraction: {data.ground_water_extraction_ham} ham (hectare-meters)
+- Annual Extractable Ground Water Resources: {data.annual_extractable_ground_water_resources_ham} ham
+- Ground Water Utilization: {(data.ground_water_extraction_ham / data.annual_extractable_ground_water_resources_ham * 100):.2f}%
+
+The groundwater situation in {data.state} shows:
+- Current extraction levels at {data.ground_water_extraction_ham} ham
+- Total available resources of {data.annual_extractable_ground_water_resources_ham} ham  
+- Rainfall contribution of {data.rainfall_mm} mm annually
+- Utilization rate of {(data.ground_water_extraction_ham / data.annual_extractable_ground_water_resources_ham * 100):.2f}% of available resources
+
+This data is from the INGRES (Integrated Groundwater Resource Information System) database for the year {data.year}.
+            """.strip()
+            
+            # Create metadata
+            metadata = {
+                "state": data.state,
+                "year": data.year,
+                "type": "groundwater_data",
+                "rainfall_mm": data.rainfall_mm,
+                "extraction_ham": data.ground_water_extraction_ham,
+                "resources_ham": data.annual_extractable_ground_water_resources_ham,
+                "utilization_percent": round(data.ground_water_extraction_ham / data.annual_extractable_ground_water_resources_ham * 100, 2)
+            }
+            
+            doc = Document(page_content=content, metadata=metadata)
+            documents.append(doc)
+            
+        return documents
 
 
 # Global preprocessor instance

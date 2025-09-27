@@ -17,15 +17,18 @@
   const sendBtn = document.getElementById("sendButton")
   const openChatCta = document.getElementById("openChatCta")
   const exploreBtn = document.getElementById("exploreBtn")
+  const panel = root.querySelector(".chatbot__panel")
 
   // Init
   document.addEventListener("DOMContentLoaded", onReady)
 
   function onReady() {
+    console.log("Chatbot initializing...")
     attachEvents()
     closeChat()
     restoreHistory()
     autoGrow(input)
+    console.log("Chatbot ready!")
   }
 
   function attachEvents() {
@@ -69,11 +72,17 @@
   function openChat() {
     state.isOpen = true
     root?.setAttribute("data-state", "open")
+    panel.style.opacity = "1"
+    panel.style.pointerEvents = "auto"
+    panel.style.transform = "scale(1) translateY(0)"
     setTimeout(() => input?.focus(), 120)
   }
   function closeChat() {
     state.isOpen = false
     root?.setAttribute("data-state", "closed")
+    panel.style.opacity = "0"
+    panel.style.pointerEvents = "none"
+    panel.style.transform = "scale(0.9) translateY(10px)"
     openBtn?.focus()
   }
 
@@ -276,4 +285,15 @@
       scrollToBottom()
     } catch {}
   }
+
+  // Optional: close when clicking outside the panel
+  document.addEventListener("mousedown", function (e) {
+    if (
+      root.getAttribute("data-state") === "open" &&
+      !panel.contains(e.target) &&
+      !openBtn.contains(e.target)
+    ) {
+      closeChat()
+    }
+  })
 })()

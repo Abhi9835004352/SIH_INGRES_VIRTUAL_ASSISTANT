@@ -1,9 +1,14 @@
 import os
 from typing import Optional
 from dotenv import load_dotenv
+from pathlib import Path
 
-# Load environment variables
-load_dotenv()
+# Get the directory where this config file is located
+config_dir = Path(__file__).parent.parent
+env_file = config_dir / ".env"
+
+# Load environment variables from the correct .env file
+load_dotenv(env_file)
 
 
 class Settings:

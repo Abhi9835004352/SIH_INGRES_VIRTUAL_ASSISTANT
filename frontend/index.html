@@ -8,6 +8,159 @@
     <title>IN-GRES | GEC-Overview</title>
     <link rel="stylesheet" href="./styles.css" />
     <style>
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            background: url('public/images/bg-texture.jpg') center center/cover no-repeat fixed;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        .bg-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 0;
+        }
+        .ingres-banner {
+            width: 100vw;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #1e3a8a;
+            padding: 18px 32px;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 2;
+        }
+        .banner-inner {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+        .brand {
+            height: 48px;
+            width: auto;
+        }
+        .ingres-title {
+            color: #fff;
+            font-size: 2.2rem;
+            font-weight: 400;
+            margin: 0 0 0 12px;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.18);
+        }
+        .home-link {
+            position: absolute;
+            top: 18px;
+            right: 32px;
+            background: #fff;
+            color: #111;
+            font-weight: 500;
+            border: 2px solid #222;
+            border-radius: 4px;
+            padding: 8px 16px;
+            text-decoration: none;
+            font-size: 1rem;
+            z-index: 3;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+        }
+        .home-link:hover {
+            background: #f0f0f0;
+        }
+        .gec-wrap {
+            flex: 1;
+            padding: 22px 16px 40px;
+            z-index: 2;
+            position: relative;
+        }
+        .gec-card {
+            max-width: 1120px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            padding: 18px 18px 22px;
+            box-shadow: 0 16px 44px rgba(0, 0, 0, 0.35);
+            color: #333;
+            overflow-y: auto;
+            max-height: 70vh;
+        }
+        .gec-card__header {
+            background: rgba(30, 58, 138, 0.1);
+            border: 1px solid rgba(30, 58, 138, 0.2);
+            border-radius: 8px;
+            padding: 12px 14px;
+            text-align: center;
+            margin-bottom: 14px;
+        }
+        .gec-card__title {
+            margin: 0;
+            font-size: clamp(1.05rem, 2vw, 1.4rem);
+            font-weight: 800;
+            letter-spacing: 0.3px;
+            color: #1e3a8a;
+            text-align: center;
+        }
+        .rule {
+            border: 0;
+            height: 1px;
+            background: rgba(0,0,0,0.2);
+            margin: 16px 6px;
+        }
+        .gec-section-title {
+            margin: 0 6px;
+            font-size: clamp(1rem, 1.8vw, 1.25rem);
+            font-weight: 800;
+            color: #333;
+        }
+        .gec-content {
+            color: #333;
+            font-size: 0.98rem;
+            line-height: 1.65;
+            margin: 0 6px;
+        }
+        .gec-content p {
+            margin: 0 0 14px;
+        }
+        .gec-card::-webkit-scrollbar {
+            width: 8px;
+            background: #ddd;
+        }
+        .gec-card::-webkit-scrollbar-thumb {
+            background: #999;
+            border-radius: 4px;
+        }
+        .ingres-footer {
+            background: #1e3a8a;
+            color: #fff;
+            padding: 18px 32px;
+            width: 100vw;
+            box-sizing: border-box;
+            margin-top: auto;
+        }
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .visitors {
+            color: #fff;
+            font-weight: 700;
+        }
+        .dots {
+            letter-spacing: 6px;
+        }
+        .credit {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+        }
+        
         /* Hero Section Visual Enhancements */
         .hero {
             position: relative;
@@ -186,17 +339,13 @@
 </head>
 
 <body class="ingres">
+    <div class="bg-overlay"></div>
     <header class="ingres-banner" role="banner" aria-label="IN-GRES banner">
         <div class="banner-inner">
-            <img
-                class="brand"
-                src="public/images/ingres-wordmark.jpg"
-                alt="IN-GRES logo"
-                width="120"
-                height="28"
-            />
-            <h1 class="ingres-title">“INDIA-Groundwater Resource Estimation System (IN-GRES)”</h1>
-            <a class="home-link" href="#" aria-label="Click to Home Page"><i class="fa fa-home"></i> Home</a>
+            <img class="brand" src="public/images/ingres-wordmark.png" alt="IN-GRES logo" />
+            <h1 class="ingres-title">"INDIA-Groundwater Resource Estimation System (IN-GRES)"</h1>
+        </div>
+        <a class="home-link" href="#" aria-label="Click to Home Page">Click to Home Page</a>
         <script>
             // Smooth scroll to top for Home button
             document.addEventListener('DOMContentLoaded', function() {
@@ -209,21 +358,13 @@
                 }
             });
         </script>
-        </div>
     </header>
 
     <main class="gec-wrap" id="homeSection" role="main">
         <section class="gec-card" aria-labelledby="gecHeading">
-            <header class="gec-card__header">
-                <h2 id="gecHeading" class="gec-card__title">GEC-Overview</h2>
-            </header>
-
-            <hr class="rule" />
-
+            <h2 id="gecHeading" class="gec-card__title">GEC-Overview</h2>
+            <br>
             <h3 class="gec-section-title">What is GEC?</h3>
-
-            <hr class="rule" />
-
             <div class="gec-content">
                 <p>
                     Assessment of ‘Dynamic Ground Water Resources of India’ is carried out at periodical intervals jointly by the
@@ -253,7 +394,7 @@
             <div class="credit">
                 <span>Powered by:</span>
                 <img
-                    src="public/images/iith-logo.jpg"
+                    src="public/images/logoIIT.png"
                     alt="Indian Institute of Technology Hyderabad"
                     height="22"
                     width="160"
@@ -262,54 +403,52 @@
             <div class="credit">
                 <span>Developed by:</span>
                 <img
-                    src="public/images/vassar-logo.jpg"
+                    src="public/images/footer-logo.png"
                     alt="Vassar Labs"
                     height="22"
-                    width="140"
+                    width="80"
                 />
             </div>
         </div>
     </footer>
 
-    <div class="chatbot" id="chatbotRoot" aria-live="polite" aria-label="INGRES Assistant" data-state="closed">
-        <div class="chatbot__panel" role="dialog" aria-modal="false" aria-labelledby="chatTitle">
-            <header class="chatbot__header">
-                <h3 id="chatTitle">Chat with INGRES Assistant</h3>
-                <button class="icon-btn" id="closeChatbotBtn" title="Close Assistant" aria-label="Close Assistant">&times;</button>
+    <div class="chatbot" id="chatbotRoot" aria-live="polite" aria-label="INGRES Assistant" data-state="closed" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;">
+        <div class="chatbot__panel" role="dialog" aria-modal="false" aria-labelledby="chatTitle" style="position: absolute; bottom: 70px; right: 0; width: 350px; background: #fff; border: 1px solid #ddd; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); overflow: hidden; transform: scale(0.9) translateY(10px); opacity: 0; pointer-events: none; transition: all 0.3s ease;">
+            <header class="chatbot__header" style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: #f8f9fa; border-bottom: 1px solid #e9ecef;">
+                <h3 id="chatTitle" style="margin: 0; font-size: 1.1rem; color: #333;">INGRES Virtual Assistant</h3>
+                <button class="icon-btn" id="closeChatbotBtn" title="Close Assistant" aria-label="Close Assistant" style="border: none; background: transparent; font-size: 20px; width: 32px; height: 32px; border-radius: 6px; cursor: pointer; color: #666;">&times;</button>
             </header>
 
-            <div class="chatbot__suggestions" id="chatSuggestions" aria-label="Suggestions">
-                <button class="chip" data-prompt="Hello">Hello</button>
-                <button class="chip" data-prompt="Rainfall data for Maharashtra">Rainfall data for Maharashtra</button>
-                <button class="chip" data-prompt="Groundwater extraction overview">Groundwater extraction overview</button>
-                <button class="chip" data-prompt="How to use INGRES?">How to use INGRES?</button>
+            <div class="chatbot__suggestions" id="chatSuggestions" aria-label="Suggestions" style="display: flex; gap: 8px; padding: 12px; flex-wrap: wrap; background: #fff; border-bottom: 1px solid #f1f3f4;">
+                <button class="chip" data-prompt="Hello" style="padding: 6px 12px; border-radius: 20px; background: #e3f2fd; color: #1976d2; font-size: 0.9rem; border: 1px solid #bbdefb; cursor: pointer;">Hello</button>
+                <button class="chip" data-prompt="Rainfall data for Maharashtra" style="padding: 6px 12px; border-radius: 20px; background: #e8f5e8; color: #2e7d32; font-size: 0.9rem; border: 1px solid #c8e6c9; cursor: pointer;">Rainfall data</button>
+                <button class="chip" data-prompt="Groundwater extraction overview" style="padding: 6px 12px; border-radius: 20px; background: #fff3e0; color: #f57c00; font-size: 0.9rem; border: 1px solid #ffcc02; cursor: pointer;">Groundwater info</button>
             </div>
 
-            <div class="chatbot__messages" id="chatMessages">
-                <div class="message message--bot">
-                    <div class="message__meta">
+            <div class="chatbot__messages" id="chatMessages" style="height: 300px; overflow: auto; padding: 12px; background: #fafafa;">
+                <div class="message message--bot" style="background: #e3f2fd; border: 1px solid #bbdefb; border-radius: 12px; padding: 12px; margin: 8px 0;">
+                    <div class="message__meta" style="display: flex; gap: 8px; align-items: center; margin-bottom: 6px; color: #666; font-size: 0.85rem;">
                         <strong>INGRES Assistant</strong> <time class="message__time">now</time>
                     </div>
-                    <div class="message__content">
-                        Welcome to INGRES (Integrated Groundwater Resource Information System)! I can help with state-wise groundwater
-                        statistics, rainfall patterns, water extraction figures, and general groundwater management guidance. Try a suggestion
-                        above or ask your own question.
+                    <div class="message__content" style="color: #333; line-height: 1.5;">
+                        Welcome to INGRES! I can help you with groundwater data, rainfall patterns, and water resource information. How can I assist you today?
                     </div>
                 </div>
             </div>
 
-            <div class="chatbot__input">
+            <div class="chatbot__input" style="display: flex; gap: 8px; padding: 12px; border-top: 1px solid #e9ecef; background: #fff;">
                 <textarea
                     id="messageInput"
-                    placeholder="Ask about groundwater data, states, rainfall... (Enter to send, Shift+Enter for new line)"
+                    placeholder="Ask about groundwater data..."
                     rows="1"
                     aria-label="Your message"
+                    style="flex: 1; min-height: 40px; max-height: 100px; resize: none; border: 1px solid #ddd; border-radius: 8px; padding: 10px; font-size: 0.95rem; outline: none;"
                 ></textarea>
-                <button id="sendButton" class="btn btn--primary" aria-label="Send message">Send</button>
+                <button id="sendButton" class="btn btn--primary" aria-label="Send message" style="padding: 10px 16px; background: #1976d2; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Send</button>
             </div>
         </div>
 
-        <button class="fab" id="openChatbotBtn" title="Chat with INGRES" aria-label="Chat with INGRES">💬</button>
+        <button class="fab" id="openChatbotBtn" title="Chat with INGRES" aria-label="Chat with INGRES" style="width: 60px; height: 60px; border-radius: 50%; border: none; background: #1976d2; color: #fff; font-size: 24px; box-shadow: 0 4px 20px rgba(25,118,210,0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10000;">💬</button>
     </div>
 
     <script src="./scripts.js" defer></script>
