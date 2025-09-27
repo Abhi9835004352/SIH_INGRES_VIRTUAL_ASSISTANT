@@ -260,15 +260,15 @@ State: {data.state}
 Year: {data.year}
 
 Groundwater Information for {data.state}:
-- Annual Rainfall: {data.rainfall_mm} mm
-- Ground Water Extraction: {data.ground_water_extraction_ham} ham (hectare-meters)
-- Annual Extractable Ground Water Resources: {data.annual_extractable_ground_water_resources_ham} ham
+- Annual Rainfall: {data.rainfall_mm:.2f} mm
+- Ground Water Extraction: {data.ground_water_extraction_ham:.2f} ham (hectare-meters)
+- Annual Extractable Ground Water Resources: {data.annual_extractable_ground_water_resources_ham:.2f} ham
 - Ground Water Utilization: {(data.ground_water_extraction_ham / data.annual_extractable_ground_water_resources_ham * 100):.2f}%
 
 The groundwater situation in {data.state} shows:
-- Current extraction levels at {data.ground_water_extraction_ham} ham
-- Total available resources of {data.annual_extractable_ground_water_resources_ham} ham  
-- Rainfall contribution of {data.rainfall_mm} mm annually
+- Current extraction levels at {data.ground_water_extraction_ham:.2f} ham
+- Total available resources of {data.annual_extractable_ground_water_resources_ham:.2f} ham  
+- Rainfall contribution of {data.rainfall_mm:.2f} mm annually
 - Utilization rate of {(data.ground_water_extraction_ham / data.annual_extractable_ground_water_resources_ham * 100):.2f}% of available resources
 
 This data is from the INGRES (Integrated Groundwater Resource Information System) database for the year {data.year}.
@@ -279,9 +279,9 @@ This data is from the INGRES (Integrated Groundwater Resource Information System
                 "state": data.state,
                 "year": data.year,
                 "type": "groundwater_data",
-                "rainfall_mm": data.rainfall_mm,
-                "extraction_ham": data.ground_water_extraction_ham,
-                "resources_ham": data.annual_extractable_ground_water_resources_ham,
+                "rainfall_mm": round(data.rainfall_mm, 2),
+                "extraction_ham": round(data.ground_water_extraction_ham, 2),
+                "resources_ham": round(data.annual_extractable_ground_water_resources_ham, 2),
                 "utilization_percent": round(data.ground_water_extraction_ham / data.annual_extractable_ground_water_resources_ham * 100, 2)
             }
             
