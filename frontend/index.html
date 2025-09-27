@@ -339,51 +339,43 @@
 </head>
 
 <body class="ingres">
-    <div class="bg-overlay"></div>
-    <header class="ingres-banner" role="banner" aria-label="IN-GRES banner">
-        <div class="banner-inner">
-            <img class="brand" src="public/images/ingres-wordmark.png" alt="IN-GRES logo" />
-            <h1 class="ingres-title">"INDIA-Groundwater Resource Estimation System (IN-GRES)"</h1>
-        </div>
-        <a class="home-link" href="#" aria-label="Click to Home Page">Click to Home Page</a>
-        <script>
-            // Smooth scroll to top for Home button
-            document.addEventListener('DOMContentLoaded', function() {
-                const homeLink = document.querySelector('.home-link');
-                if (homeLink) {
-                    homeLink.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                    });
-                }
-            });
-        </script>
-    </header>
-
-    <main class="gec-wrap" id="homeSection" role="main">
-        <section class="gec-card" aria-labelledby="gecHeading">
-            <h2 id="gecHeading" class="gec-card__title">GEC-Overview</h2>
-            <br>
-            <h3 class="gec-section-title">What is GEC?</h3>
-            <div class="gec-content">
-                <p>
-                    Assessment of ‘Dynamic Ground Water Resources of India’ is carried out at periodical intervals jointly by the
-                    Central Ground Water Board (CGWB) and State/UT Ground Water Departments under the guidance of State Level
-                    Committee at State levels and under the overall supervision of Central Level Expert Group. Last assessment
-                    was carried out in 2017 and re-assessment of Dynamic Ground Water Resources of India, 2020 has been carried
-                    out based on the norms and guidelines of Ground Water Resource Estimation Committee (GEC-2015) methodology.
-                </p>
-
-                <p>
-                    The assessment involves computation of Annual Ground Water Recharge and Annual Extractable Ground Water
-                    Resources, Total Annual Ground Water Extraction (utilization) and the percentage of utilization with respect
-                    to Annual Extractable Ground Water Resources (Stage of Extraction). The assessment units (blocks/taluks/
-                    mandals/tehsil/firkas etc.) are categorized based on the Stage of Extraction (SoE) i.e ‘Safe’ if SoE &lt; 70%;
-                    ‘Semi-critical’ if SoE ≥ 70% and ≤ 90%; ‘Critical’ if SoE &gt; 90% and ≤ 100% and ‘Over-exploited’ if SoE &gt; 100%.
-                </p>
-            </div>
-        </section>
-    </main>
+    <div class="single-header">
+        <img class="brand" src="public/images/logo1.png" alt="IN-GRES logo" />
+    </div>
+    <div class="main-title">
+        <h1 class="ingres-title">"INDIA-Groundwater Resource Estimation System (IN-GRES)"</h1>
+    </div>
+    <div class="single-content">
+        <main class="gec-wrap" id="homeSection" role="main">
+            <section class="gec-card" aria-labelledby="gecHeading">
+                <h2 id="gecHeading" class="gec-card__title">GEC-Overview</h2>
+                <br>
+                <div class="gec-content-scroll" style="max-height: 350px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 8px; padding: 12px; background: #fafbfc;">
+                    <h3 class="gec-section-title" style="margin-top:0;">What is GEC?</h3>
+                    <p>
+                        “INDIA-Groundwater Resource Estimation System (IN-GRES)” is a software/web based application developed by Central Ground Water Board (CGWB) in collaboration with Indian Institute of Technology-Hyderabad (IIT-H) for assessment of ground water resources.
+                    </p>
+                    <h4 style="margin-top: 1em; margin-bottom: 0.5em; font-size: 1.08em; color: #1e3a8a;">Objectives</h4>
+                    <ul style="margin-top: 0; margin-bottom: 0.7em; padding-left: 1.2em;">
+                        <li>To provide common and standardized platform for Ground Water Resource Assessment for the entire country based on Ground Water Resource Estimation Committee-2015 (GEC-2015) methodology.</li>
+                        <li>Pan-India operationalization (Joint assessment by CGWB and State Ground Water/ Nodal Departments).</li>
+                        <li>Visibility dashboards allowing user to view the data/map and download reports.</li>
+                    </ul>
+                    <p style="margin-bottom: 0.7em;">
+                        IN-GRES provides the following information/data/map to the users:
+                    </p>
+                    <ul style="margin-top: 0; margin-bottom: 0.7em; padding-left: 1.2em;">
+                        <li>Dynamic Ground Water Resources of India, 2020 (India, State/UT, District, Assessment Units-wise) Annual Ground Water Recharge, Annual Extractable Ground Water Resources, Ground Water Extraction, Stage of Extraction and Categorization of the assessment units etc.</li>
+                        <li>Thematic map (GIS) based on the Annual Ground Water Recharge, Annual Ground Water Extraction and categorization of assessment units etc.</li>
+                    </ul>
+                    <h4 style="margin-top: 1em; margin-bottom: 0.5em; font-size: 1.08em; color: #1e3a8a;">Remark</h4>
+                    <p>
+                        In the MIS datasheets, all the parameters (Annual Ground Water Recharge, Annual Extractable Ground Water Resources, and Ground Water Extraction etc.) are given under three components i.e Command (C), Non-Command (NC) and Poor Water Quality (PQ). However the dynamic ground water resources comprises of sum total of fresh water resources under Command(C)and Non-command(NC) components and excludes the resources under poor water quality (saline). So for all practical purposes fresh water resources are taken into consideration including categorization of assessment units.
+                    </p>
+                </div>
+            </section>
+        </main>
+    </div>
 
     <footer class="ingres-footer" role="contentinfo">
         <div class="footer-inner">
@@ -451,7 +443,10 @@
         <button class="fab" id="openChatbotBtn" title="Chat with INGRES" aria-label="Chat with INGRES" style="width: 60px; height: 60px; border-radius: 50%; border: none; background: #1976d2; color: #fff; font-size: 24px; box-shadow: 0 4px 20px rgba(25,118,210,0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10000;">💬</button>
     </div>
 
-    <script src="./scripts.js" defer></script>
+    <script src="./scripts.js"></script>
+    <div class="gtranslate_wrapper"></div>
+    <script>window.gtranslateSettings = { "default_language": "en", "native_language_names": true, "languages": ["en", "hi","kn","te"], "wrapper_selector": ".gtranslate_wrapper" }</script>
+    <script src="https://cdn.gtranslate.net/widgets/latest/float.js" defer></script>
 </body>
 
 </html>

@@ -285,15 +285,30 @@
       scrollToBottom()
     } catch {}
   }
+})()
 
-  // Optional: close when clicking outside the panel
-  document.addEventListener("mousedown", function (e) {
-    if (
-      root.getAttribute("data-state") === "open" &&
-      !panel.contains(e.target) &&
-      !openBtn.contains(e.target)
-    ) {
-      closeChat()
-    }
-  })
+document.addEventListener("DOMContentLoaded", function () {
+  const chatbotRoot = document.getElementById("chatbotRoot")
+  const openBtn = document.getElementById("openChatbotBtn")
+  const closeBtn = document.getElementById("closeChatbotBtn")
+  const panel = chatbotRoot.querySelector(".chatbot__panel")
+
+  function openChatbot() {
+    chatbotRoot.setAttribute("data-state", "open")
+    panel.style.opacity = "1"
+    panel.style.pointerEvents = "auto"
+    panel.style.transform = "scale(1) translateY(0)"
+  }
+
+  function closeChatbot() {
+    chatbotRoot.setAttribute("data-state", "closed")
+    panel.style.opacity = "0"
+    panel.style.pointerEvents = "none"
+    panel.style.transform = "scale(0.9) translateY(10px)"
+  }
+
+  if (openBtn && closeBtn && panel) {
+    openBtn.addEventListener("click", openChatbot)
+    closeBtn.addEventListener("click", closeChatbot)
+  }
 })()

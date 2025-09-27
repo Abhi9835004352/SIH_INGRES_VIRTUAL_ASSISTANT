@@ -425,151 +425,91 @@ body {
 
 /* Page reset overrides */
 body.ingres {
-  background: var(--page-bg) url("public/images/bg-texture.jpg") center / cover fixed no-repeat;
+  background: url("public/images/bg.jpg") center/cover no-repeat fixed;
   color: var(--ink-100);
-}
-
-/* Banner */
-.ingres-banner {
-  padding: 28px 24px 8px;
-  background-image: linear-gradient(180deg, rgba(8, 10, 12, 0.58), rgba(8, 10, 12, 0.58)), url("public/images/banner-bg.jpg");
-  background-size: cover;
-  background-position: center;
-  border-bottom: 1px solid var(--line);
-}
-.banner-inner {
-  position: relative;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-.brand {
-  position: absolute;
-  left: 0;
-  top: 2px;
-  opacity: 0.95;
-}
-.ingres-title {
+  min-height: 100vh;
   margin: 0;
-  text-align: center;
-  font-size: clamp(1.25rem, 2.6vw, 2rem);
-  letter-spacing: 0.2px;
-  font-weight: 700;
-}
-.home-link {
-  position: absolute;
-  right: 0;
-  top: 0;
-  border: 1px solid var(--line);
-  color: var(--ink-100);
-  background: rgba(255, 255, 255, 0.06);
-  padding: 8px 12px;
-  border-radius: 10px;
-  text-decoration: none;
-  font-size: 0.95rem;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
-}
-.home-link:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.32);
 }
 
-/* GEC Card */
-.gec-wrap {
-  padding: 22px 16px 40px;
-}
+/* Remove container backgrounds, borders, and box-shadows */
+.ingres-banner,
+.banner-inner,
+.gec-wrap,
 .gec-card {
-  max-width: 1120px;
-  margin: 0 auto;
-  background: #1c1f23;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 18px 18px 22px;
-  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.35);
-}
-.gec-card__header {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 12px 14px;
-  text-align: center;
-  margin-bottom: 14px;
-}
-.gec-card__title {
-  margin: 0;
-  font-size: clamp(1.05rem, 2vw, 1.4rem);
-  font-weight: 800;
-  letter-spacing: 0.3px;
-  color: var(--ink-100);
-}
-.rule {
-  border: 0;
-  height: 1px;
-  background: var(--line);
-  margin: 16px 6px;
-}
-.gec-section-title {
-  margin: 0 6px;
-  font-size: clamp(1rem, 1.8vw, 1.25rem);
-  font-weight: 800;
-  color: var(--ink-100);
-}
-.gec-content {
-  color: var(--ink-300);
-  font-size: 0.98rem;
-  line-height: 1.65;
-  margin: 0 6px;
-}
-.gec-content p {
-  margin: 0 0 14px;
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 auto !important;
 }
 
-/* Footer */
+/* Layout for logo and title at the top */
+.single-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 32px 24px 18px 24px;
+  justify-content: flex-start;
+}
+
+.brand {
+  height: 54px;
+  width: auto;
+  display: block;
+}
+
+.main-title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 32px;
+    margin-bottom: 24px;
+    width: 100%;
+}
+
+.ingres-title {
+    color: #fff;
+    font-size: 2.2rem;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.28);
+    text-align: center;
+}
+
+/* Main content styling */
+.single-content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+  color: #f3f4f6;
+  font-size: 1.08rem;
+  line-height: 1.7;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+
+/* Footer remains at the bottom */
 .ingres-footer {
   padding: 18px 12px 26px;
-}
-.footer-inner {
-  max-width: 1120px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 14px;
-  align-items: center;
-}
-.footer-inner .credit {
-  display: inline-flex;
-  gap: 10px;
-  align-items: center;
-  color: var(--ink-500);
-  font-size: 0.95rem;
-}
-.visitors {
-  color: var(--ink-100);
-  font-weight: 700;
-}
-.dots {
-  letter-spacing: 6px;
+  color: #e5e7eb;
+  text-align: center;
+  font-size: 1rem;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  background: none;
+  border: none;
+  box-shadow: none;
 }
 
-/* Small screens */
-@media (max-width: 760px) {
-  .footer-inner {
-    grid-template-columns: 1fr;
-    justify-items: center;
-    text-align: center;
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .single-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 18px 8vw 10px 8vw;
   }
-  .home-link {
-    position: static;
-    display: inline-block;
-    margin-left: auto;
-  }
-  .brand {
-    position: static;
-    display: inline-block;
-    margin-right: 10px;
-  }
-  .banner-inner {
-    display: grid;
-    gap: 10px;
-    justify-items: center;
+  .single-content {
+    padding: 12px 4vw;
+    font-size: 1rem;
   }
 }
