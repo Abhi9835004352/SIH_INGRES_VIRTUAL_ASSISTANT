@@ -53,6 +53,7 @@ class QueryProcessor:
                 "uttarakhand",
                 "west bengal",
                 "delhi",
+                "new delhi",
                 "chandigarh",
                 "dadra and nagar haveli",
                 "daman and diu",
@@ -72,6 +73,7 @@ class QueryProcessor:
                 "aquifer",
                 "bore well",
                 "tube well",
+                "ground water level",
             ],
             "years": ["2024", "2025", "2023", "2022", "2021"],
         }
@@ -83,6 +85,7 @@ class QueryProcessor:
         try:
             # Step 1: Preprocess and extract entities/intent
             entities = self._extract_entities(request.query)
+            entities = self._map_entities(entities)
             intent = self._classify_intent(request.query)
 
             # Step 2: Handle special intents (greeting, farewell, help) without data retrieval
@@ -159,80 +162,50 @@ class QueryProcessor:
 
         return entities
 
+    def _map_entities(self, entities: Dict[str, List[str]]) -> Dict[str, List[str]]:
+        """Map entity variations to a standardized format"""
+        if "new delhi" in entities["states"]:
+            entities["states"].remove("new delhi")
+            if "delhi" not in entities["states"]:
+                entities["states"].append("delhi")
+        return entities
+
+
     def _classify_intent(self, query: str) -> str:
         """Classify user intent with improved accuracy"""
         query_lower = query.lower()
-        
-        # Help patterns - FIXED (check before greetings to avoid conflicts)
+
+        # Help patterns
         help_patterns = ["help", "how to use", "guide", "tutorial", "assistance", "support"]
-        help_questions = ["how to use this", "how do i", "can you help", "need help", "how to"]
-        if (any(help_pattern in query_lower for help_pattern in help_patterns) or 
-            any(help_q in query_lower for help_q in help_questions)):
+        if any(p in query_lower for p in help_patterns):
             return "help"
-        
-        # Greeting patterns (moved after help to avoid conflicts)
-        greeting_patterns = ["hi", "hello", "hey", "namaste", "good morning", "good evening", "greetings"]
-        if any(greeting in query_lower for greeting in greeting_patterns):
+
+        # Greeting patterns
+        greeting_patterns = ["hi", "hello", "hey", "namaste", "good morning", "good evening"]
+        if any(p in query_lower for p in greeting_patterns):
             return "greeting"
-        
+
         # Farewell patterns
-        farewell_patterns = ["bye", "goodbye", "see you", "farewell", "take care"]
-        if any(farewell in query_lower for farewell in farewell_patterns):
+        farewell_patterns = ["bye", "goodbye", "see you", "farewell"]
+        if any(p in query_lower for p in farewell_patterns):
             return "farewell"
-        
-        # Comparison patterns  
-        comparison_patterns = ["compare", " vs ", " versus ", "difference between", "compare between"]
-        if any(pattern in query_lower for pattern in comparison_patterns):
-            return "comparison"
-        
-        # STATISTICS patterns (highest priority for data queries)
-        data_request_patterns = [
-            "what is rainfall", "rainfall in", "rainfall data", "rainfall for",
-            "what is groundwater", "groundwater in", "groundwater data", "groundwater for", 
-            "show me", "give me", "tell me about", "data for", "information for",
-            "statistics for", "stats for", "how much rain", "rain in"
+
+        # Quantitative patterns
+        quantitative_patterns = [
+            "how much", "how many", "what is the value", "total", "average", 
+            "statistics", "data for", "rainfall in", "groundwater level"
         ]
-        
-        # If query contains any data request pattern, classify as statistics
-        if any(pattern in query_lower for pattern in data_request_patterns):
-            return "statistics"
-        
-        # Additional statistics indicators
-        stats_keywords = ["rainfall", "groundwater", "extraction", "resources", "data", "statistics", "mm", "cubic"]
-        state_mentioned = any(state in query_lower for state in self.entities_patterns["states"])
-        metric_mentioned = any(metric in query_lower for metric in self.entities_patterns["metrics"])
-        
-        # If query mentions state + metric, it's likely a statistics query
-        if state_mentioned and (metric_mentioned or any(keyword in query_lower for keyword in stats_keywords)):
-            return "statistics"
-        
-        # EXPLANATION patterns - For concept/definition questions
-        # REFINED: Only pure conceptual questions without data request indicators
-        explanation_patterns = [
-            "how does", "what does", "explain", "definition of", "meaning of",
-            "what are the", "how do", "why does", "process of"
+        if any(p in query_lower for p in quantitative_patterns):
+            return "quantitative"
+
+        # Qualitative patterns
+        qualitative_patterns = [
+            "what is", "explain", "describe", "how does", "what are the effects",
+            "definition of", "tell me about"
         ]
-        
-        # More specific definition patterns that should be explanations
-        definition_patterns = ["what is groundwater extraction", "what is water cycle", "what is"]
-        
-        # Check for pure definition questions (without state/data context)
-        if any(pattern in query_lower for pattern in definition_patterns):
-            # If it's asking "what is X" without mentioning specific locations/data
-            if not state_mentioned and not any(data_word in query_lower for data_word in ["data", "in ", "for "]):
-                return "explanation"
-        
-        if any(pattern in query_lower for pattern in explanation_patterns):
-            # But if it also contains data request patterns, prioritize statistics
-            if not any(pattern in query_lower for pattern in data_request_patterns):
-                return "explanation"
-            else:
-                return "statistics"  # Data request takes priority
-        
-        # Default classification based on content
-        if any(keyword in query_lower for keyword in ["rainfall", "groundwater", "extraction", "data"]):
-            return "statistics"
-        
+        if any(p in query_lower for p in qualitative_patterns):
+            return "qualitative"
+
         return "general"
 
     async def _retrieve_structured_data(
@@ -304,7 +277,6 @@ class QueryProcessor:
 
                 context_parts.append(f"\nRecord {i+1}:")
 
-                # Handle different key casings - MORE COMPREHENSIVE
                 state_key = next(
                     (
                         k
@@ -457,11 +429,12 @@ Please provide a helpful overview of what you can assist with regarding groundwa
                 prompt = f"""You are INGRES Assistant, a specialized AI for India's Integrated Groundwater Resource Information System.
 
 IMPORTANT INSTRUCTIONS:
-- You MUST use the provided context data to answer the user's question
-- If the context contains specific numerical data (rainfall, extraction, resources), you MUST include these exact numbers in your response
-- Be specific and data-driven in your answers
-- If context shows data for a specific state, provide that state's information
-- Don't say "I don't have information" if the context clearly contains relevant data
+- You MUST use the provided context data to answer the user's question.
+- If the context does not contain a direct answer to the user's question, you MUST explicitly state that the requested information is not available and then provide the available related information from the context.
+- If the context contains specific numerical data (rainfall, extraction, resources), you MUST include these exact numbers in your response.
+- Be specific and data-driven in your answers.
+- If context shows data for a specific state, provide that state's information.
+- Don't say "I don't have information" if the context clearly contains relevant data.
 
 CONTEXT DATA PROVIDED:
 {context}
@@ -540,11 +513,11 @@ Just ask me about any specific state, data point, or general groundwater topic!"
             return "I couldn't find specific information to answer your query. Please try rephrasing your question or ask about specific states or groundwater metrics like rainfall, extraction, or resources."
 
         # Template-based responses for technical queries
-        if intent == "statistics" and "state" in context.lower():
+        if intent == "quantitative" and "state" in context.lower():
             return "Based on the available data, here are the groundwater statistics for the requested region. The data includes rainfall patterns, groundwater extraction figures, and annual extractable resources. Please refer to the sources for detailed numbers and specific metrics."
         elif intent == "comparison":
             return "I can help you compare groundwater data between different states or regions. The comparison would include rainfall patterns, extraction rates, and available resources. Please specify which states or metrics you'd like to compare."
-        elif intent == "explanation":
+        elif intent == "qualitative":
             return "I can explain various aspects of groundwater management and the INGRES system. This includes how data is collected, what different metrics mean, and how to interpret the results."
         else:
             return "Based on the available information in our groundwater database, I found some relevant data for your query. The information includes state-wise statistics, rainfall data, and resource availability figures."

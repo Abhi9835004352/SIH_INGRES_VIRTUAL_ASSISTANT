@@ -11,7 +11,7 @@ from .models import QueryRequest, QueryResponse, FeedbackRequest
 from .database import db_manager
 from .vector_store import vector_store
 from .preprocessor import preprocessor
-from .rag_engine import query_processor
+from .rag_engine_langchain import get_query_processor
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -111,6 +111,7 @@ async def health_check():
 @app.post("/query", response_model=QueryResponse)
 async def process_query(request: QueryRequest):
     """Process a user query and return AI-generated response"""
+    query_processor = get_query_processor()
     try:
         # Generate session ID if not provided
         if not request.session_id:
@@ -210,7 +211,11 @@ async def search_structured_data(
 async def search_unstructured_data(query: str, top_k: int = 5):
     """Search unstructured data using vector similarity"""
     try:
-        results = vector_store.search_similar(query, top_k)
+        retriever = vector_store.as_retriever()
+        if retriever:
+            results = await retriever.ainvoke(query, top_k=top_k)
+        else:
+            results = []
 
         return {"results": results, "count": len(results), "query": query}
     except Exception as e:
