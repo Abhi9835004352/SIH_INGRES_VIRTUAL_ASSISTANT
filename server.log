@@ -1,0 +1,68 @@
+INFO:__main__:🔍 Checking system requirements...
+INFO:__main__:✅ Requirements check completed!
+/Users/abhishek9835/Desktop/sih_2025/run.py:115: DeprecationWarning: There is no current event loop
+  loop = asyncio.get_event_loop()
+INFO:__main__:🚀 Initializing INGRES RAG Chatbot System...
+INFO:__main__:📊 Setting up database...
+INFO:app.database:✅ Connected to MongoDB Atlas successfully
+INFO:app.database:✅ Database indexes created successfully
+INFO:__main__:🔍 Setting up vector store...
+INFO:app.vector_store:Vector store loaded with 160 documents
+INFO:__main__:✅ Vector store loaded successfully!
+INFO:__main__:📈 System Statistics:
+INFO:__main__:   - Vector Store: 160 documents
+INFO:__main__:   - Embedding Model: all-MiniLM-L6-v2
+INFO:__main__:   - CSV Files: 1
+INFO:__main__:   - Excel Files: 6
+INFO:__main__:   - HTML Files: 1
+INFO:__main__:   - PDF Files: 1
+INFO:__main__:✅ System initialization completed successfully!
+INFO:__main__:🚀 Starting FastAPI server...
+INFO:     Started server process [43601]
+INFO:     Waiting for application startup.
+INFO:app.main:Starting INGRES RAG Chatbot API...
+WARNING:app.database:⚠️  Could not create indexes (this is okay for free MongoDB clusters): Task <Task pending name='Task-3' coro=<LifespanOn.main() running at /Users/abhishek9835/Desktop/sih_2025/venv/lib/python3.13/site-packages/uvicorn/lifespan/on.py:86>> got Future <Future pending cb=[_chain_future.<locals>._call_check_cancel() at /Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/asyncio/futures.py:384]> attached to a different loop
+INFO:app.vector_store:Vector store loaded with 160 documents
+INFO:app.main:Vector store loaded successfully
+INFO:app.main:API startup completed successfully
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
+INFO:app.main:Processing query from session test123: What is the rainfall data for Maharashtra?...
+INFO:app.database:Querying groundwater data with: {'$or': [{'STATE': {'$regex': 'maharashtra', '$options': 'i'}}, {'State': {'$regex': 'maharashtra', '$options': 'i'}}, {'state': {'$regex': 'maharashtra', '$options': 'i'}}]}
+ERROR:app.database:Error querying groundwater data: Task <Task pending name='Task-6' coro=<RequestResponseCycle.run_asgi() running at /Users/abhishek9835/Desktop/sih_2025/venv/lib/python3.13/site-packages/uvicorn/protocols/http/h11_impl.py:403> cb=[set.discard()]> got Future <Future pending> attached to a different loop
+INFO:app.rag_engine:Found 0 records for state: maharashtra
+INFO:app.database:Querying groundwater data with: {'$or': [{'STATE': {'$regex': 'maharashtra', '$options': 'i'}}, {'State': {'$regex': 'maharashtra', '$options': 'i'}}, {'state': {'$regex': 'maharashtra', '$options': 'i'}}]}
+ERROR:app.database:Error querying groundwater data: Task <Task pending name='Task-6' coro=<RequestResponseCycle.run_asgi() running at /Users/abhishek9835/Desktop/sih_2025/venv/lib/python3.13/site-packages/uvicorn/protocols/http/h11_impl.py:403> cb=[set.discard()]> got Future <Future pending> attached to a different loop
+INFO:app.rag_engine:Direct match found 0 records for state: maharashtra
+INFO:app.database:Querying groundwater data with: {'$or': [{'STATE': {'$regex': 'What is the rainfall data for Maharashtra?', '$options': 'i'}}, {'State': {'$regex': 'What is the rainfall data for Maharashtra?', '$options': 'i'}}, {'state': {'$regex': 'What is the rainfall data for Maharashtra?', '$options': 'i'}}, {'year': {'$regex': 'What is the rainfall data for Maharashtra?', '$options': 'i'}}]}
+ERROR:app.database:Error querying groundwater data: Task <Task pending name='Task-6' coro=<RequestResponseCycle.run_asgi() running at /Users/abhishek9835/Desktop/sih_2025/venv/lib/python3.13/site-packages/uvicorn/protocols/http/h11_impl.py:403> cb=[set.discard()]> got Future <Future pending> attached to a different loop
+INFO:app.rag_engine:Text search found 0 records
+INFO:app.rag_engine:Total structured results: 0
+🌊 INGRES RAG Chatbot System
+==================================================
+
+==================================================
+🌐 Server will be available at:
+   API: http://localhost:8001
+   Docs: http://localhost:8001/docs
+   Frontend: Open frontend/index.html in your browser
+==================================================
+
+Press Ctrl+C to stop the server
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00,  2.14it/s]Batches: 100%|██████████| 1/1 [00:00<00:00,  2.13it/s]
+INFO:app.rag_engine:Building context with 0 structured and 5 unstructured results
+INFO:app.rag_engine:Built context length: 1368 characters
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1758910123.529908 5736297 alts_credentials.cc:93] ALTS creds ignored. Not running on GCP and untrusted ALTS is not enabled.
+ERROR:app.rag_engine:Error generating answer with Gemini: 404 Publisher Model `projects/generativelanguage-ga/locations/us-central1/publishers/google/models/gemini-1.5-flash-002` was not found or your project does not have access to it. Please ensure you are using a valid model version. For more information, see: https://cloud.google.com/vertex-ai/generative-ai/docs/learn/model-versions
+INFO:app.rag_engine:Query processed successfully in 1.80s
+INFO:app.main:Query processed successfully. Response length: 178
+INFO:     127.0.0.1:61847 - "POST /query HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:app.main:Shutting down INGRES RAG Chatbot API...
+INFO:app.database:Database connection closed
+INFO:     Application shutdown complete.
+INFO:     Finished server process [43601]
+/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/multiprocessing/resource_tracker.py:277: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown: {'/loky-43601-ps37qk1f'}
+  warnings.warn(
