@@ -2,319 +2,317 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INGRES Groundwater Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>IN-GRES | GEC-Overview</title>
+    <link rel="stylesheet" href="./styles.css" />
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-
-        .chat-container {
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            height: 600px;
+        /* Hero Section Visual Enhancements */
+        .hero {
+            position: relative;
+            overflow: hidden;
+            background: #2196F3;
+            color: #fff;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 10vw 60px 10vw;
+            min-height: 340px;
+            box-sizing: border-box;
         }
-
-        .chat-header {
-            background-color: #2196F3;
-            color: white;
-            padding: 20px;
-            border-radius: 10px 10px 0 0;
+        .hero__title {
+            font-size: 3.2rem;
+            margin-bottom: 16px;
+            letter-spacing: 1.5px;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-weight: 700;
+            animation: floatTitle 2.5s ease-in-out infinite alternate;
+            max-width: 95vw;
+            word-break: break-word;
             text-align: center;
         }
-
-        .chat-messages {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 20px;
+        @keyframes floatTitle {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-10px); }
         }
-
-        .message {
-            margin-bottom: 15px;
-            padding: 10px;
-            border-radius: 8px;
-            max-width: 80%;
+        .hero__subtitle {
+            font-size: 1.25rem;
+            margin-bottom: 0;
+            max-width: 700px;
+            width: 95vw;
+            line-height: 1.7;
+            text-shadow: 0 2px 8px rgba(33,150,243,0.10);
+            word-break: break-word;
+            text-align: center;
         }
-
-        .user-message {
-            background-color: #e3f2fd;
+        .hero__actions {
+            display: flex;
+            gap: 16px;
+            margin-top: 24px;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: center;
+        }
+        .btn--primary {
+            background-color: #fff;
+            color: #2196F3;
+        }
+        .btn--ghost {
+            background-color: transparent;
+            color: #fff;
+            border: 2px solid #fff;
+        }
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(120deg, #e0eafc 0%, #cfdef3 100%);
+        }
+        .surface {
+            width: 100vw;
+            max-width: 1200px;
+            margin: -60px auto 0 auto;
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10);
+            padding: 40px 4vw 32px 4vw;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+        .stats-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 28px;
+            justify-content: center;
+            margin: 40px 0 24px 0;
+        }
+        .stat-card {
+            background: linear-gradient(120deg, #e3f2fd 60%, #bbdefb 100%);
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.08);
+            padding: 32px 40px;
+            min-width: 180px;
+            flex: 1 1 220px;
+            max-width: 260px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .stat-card__value {
+            margin: 0 0 10px 0;
+            color: #1976D2;
+            font-size: 2.3rem;
+        }
+        .stat-card__label {
+            color: #333;
+            font-size: 1.13rem;
+        }
+        .highlights {
+            margin-top: 40px;
+            text-align: left;
+            max-width: 700px;
             margin-left: auto;
-            text-align: right;
-        }
-
-        .bot-message {
-            background-color: #f1f8e9;
             margin-right: auto;
         }
-
-        .input-area {
-            display: flex;
-            padding: 20px;
-            border-top: 1px solid #eee;
+        .section-title {
+            color: #1976D2;
+            margin-bottom: 12px;
+            font-size: 1.3rem;
         }
-
-        #messageInput {
-            flex-grow: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
+        .highlights__list {
+            padding-left: 20px;
         }
-
-        #sendButton {
-            margin-left: 10px;
-            padding: 10px 20px;
-            background-color: #2196F3;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
+        .highlights__list li {
+            margin-bottom: 12px;
+            font-size: 1.13rem;
         }
-
-        #sendButton:hover {
-            background-color: #1976D2;
+        .footer {
+            width: 100vw;
+            text-align: center;
+            color: #1976D2;
+            font-size: 1rem;
+            margin-top: 60px;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
         }
-
-        #sendButton:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
+        @media (max-width: 900px) {
+            .surface {
+                max-width: 98vw;
+                padding: 18px 2vw 18px 2vw;
+            }
+            .stats-grid {
+                gap: 12px;
+            }
+            .stat-card {
+                padding: 18px 8px;
+                min-width: 120px;
+                max-width: 98vw;
+            }
         }
-
-        .loading {
-            font-style: italic;
-            color: #666;
-        }
-
-        .sources {
-            margin-top: 10px;
-            padding: 10px;
-            background-color: #f9f9f9;
-            border-left: 3px solid #2196F3;
-            font-size: 12px;
-        }
-
-        .feedback-buttons {
-            margin-top: 10px;
-        }
-
-        .feedback-btn {
-            margin-right: 5px;
-            padding: 5px 10px;
-            font-size: 12px;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-
-        .thumb-up {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        .thumb-down {
-            background-color: #f44336;
-            color: white;
+        @media (max-width: 700px) {
+            .hero {
+                padding: 32px 2vw 24px 2vw;
+            }
+            .hero__title {
+                font-size: 2rem;
+                max-width: 98vw;
+            }
+            .hero__subtitle {
+                font-size: 1rem;
+                max-width: 98vw;
+            }
+            .surface {
+                margin: -30px auto 0 auto;
+                padding: 10px 2vw 10px 2vw;
+            }
+            .stats-grid {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .stat-card {
+                padding: 12px 4px;
+            }
         }
     </style>
 </head>
 
-<body>
-    <h1>🌊 INGRES Groundwater Assistant</h1>
-    <p>Your AI-powered companion for groundwater resources in India. Start with a simple "Hi" or dive into technical
-        queries!</p>
-
-    <div class="chat-container">
-        <div class="chat-header">
-            <h2>Chat with INGRES Assistant</h2>
+<body class="ingres">
+    <header class="ingres-banner" role="banner" aria-label="IN-GRES banner">
+        <div class="banner-inner">
+            <img
+                class="brand"
+                src="public/images/ingres-wordmark.jpg"
+                alt="IN-GRES logo"
+                width="120"
+                height="28"
+            />
+            <h1 class="ingres-title">“INDIA-Groundwater Resource Estimation System (IN-GRES)”</h1>
+            <a class="home-link" href="#" aria-label="Click to Home Page"><i class="fa fa-home"></i> Home</a>
+        <script>
+            // Smooth scroll to top for Home button
+            document.addEventListener('DOMContentLoaded', function() {
+                const homeLink = document.querySelector('.home-link');
+                if (homeLink) {
+                    homeLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    });
+                }
+            });
+        </script>
         </div>
-        <div class="chat-messages" id="chatMessages">
-            <div class="message bot-message">
-                <strong>INGRES Assistant:</strong> Welcome to INGRES (Integrated Groundwater Resource Information
-                System)! 🌊
+    </header>
 
-                <p>I'm your groundwater resources assistant for India. I can help you with:</p>
-                <ul>
-                    <li>🔹 <strong>State-wise groundwater statistics</strong> and data</li>
-                    <li>🔹 <strong>Rainfall patterns</strong> and their relationship with groundwater</li>
-                    <li>🔹 <strong>Water extraction figures</strong> and resource availability</li>
-                    <li>🔹 <strong>INGRES system guidance</strong> and technical help</li>
-                    <li>🔹 <strong>General groundwater management</strong> questions</li>
-                </ul>
+    <main class="gec-wrap" id="homeSection" role="main">
+        <section class="gec-card" aria-labelledby="gecHeading">
+            <header class="gec-card__header">
+                <h2 id="gecHeading" class="gec-card__title">GEC-Overview</h2>
+            </header>
 
-                <p><strong>Try asking me:</strong></p>
-                <div style="background: #f0f8ff; padding: 10px; border-radius: 5px; margin: 10px 0; font-size: 14px;">
-                    • "Hi" or "Hello" for a warm greeting<br>
-                    • "What's the rainfall data for Maharashtra?"<br>
-                    • "Help me understand groundwater extraction"<br>
-                    • "How do I use the INGRES system?"
-                </div>
+            <hr class="rule" />
 
-                What would you like to know about groundwater resources today?
+            <h3 class="gec-section-title">What is GEC?</h3>
+
+            <hr class="rule" />
+
+            <div class="gec-content">
+                <p>
+                    Assessment of ‘Dynamic Ground Water Resources of India’ is carried out at periodical intervals jointly by the
+                    Central Ground Water Board (CGWB) and State/UT Ground Water Departments under the guidance of State Level
+                    Committee at State levels and under the overall supervision of Central Level Expert Group. Last assessment
+                    was carried out in 2017 and re-assessment of Dynamic Ground Water Resources of India, 2020 has been carried
+                    out based on the norms and guidelines of Ground Water Resource Estimation Committee (GEC-2015) methodology.
+                </p>
+
+                <p>
+                    The assessment involves computation of Annual Ground Water Recharge and Annual Extractable Ground Water
+                    Resources, Total Annual Ground Water Extraction (utilization) and the percentage of utilization with respect
+                    to Annual Extractable Ground Water Resources (Stage of Extraction). The assessment units (blocks/taluks/
+                    mandals/tehsil/firkas etc.) are categorized based on the Stage of Extraction (SoE) i.e ‘Safe’ if SoE &lt; 70%;
+                    ‘Semi-critical’ if SoE ≥ 70% and ≤ 90%; ‘Critical’ if SoE &gt; 90% and ≤ 100% and ‘Over-exploited’ if SoE &gt; 100%.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="ingres-footer" role="contentinfo">
+        <div class="footer-inner">
+            <div class="visitors">
+                <strong>Visitors:</strong>
+                <span class="dots">• • • •</span>
+            </div>
+            <div class="credit">
+                <span>Powered by:</span>
+                <img
+                    src="public/images/iith-logo.jpg"
+                    alt="Indian Institute of Technology Hyderabad"
+                    height="22"
+                    width="160"
+                />
+            </div>
+            <div class="credit">
+                <span>Developed by:</span>
+                <img
+                    src="public/images/vassar-logo.jpg"
+                    alt="Vassar Labs"
+                    height="22"
+                    width="140"
+                />
             </div>
         </div>
-        <div class="input-area">
-            <input type="text" id="messageInput"
-                placeholder="Say hi, or ask about groundwater data, states, rainfall..."
-                onkeypress="handleKeyPress(event)">
-            <button id="sendButton" onclick="sendMessage()">Send</button>
+    </footer>
+
+    <div class="chatbot" id="chatbotRoot" aria-live="polite" aria-label="INGRES Assistant" data-state="closed">
+        <div class="chatbot__panel" role="dialog" aria-modal="false" aria-labelledby="chatTitle">
+            <header class="chatbot__header">
+                <h3 id="chatTitle">Chat with INGRES Assistant</h3>
+                <button class="icon-btn" id="closeChatbotBtn" title="Close Assistant" aria-label="Close Assistant">&times;</button>
+            </header>
+
+            <div class="chatbot__suggestions" id="chatSuggestions" aria-label="Suggestions">
+                <button class="chip" data-prompt="Hello">Hello</button>
+                <button class="chip" data-prompt="Rainfall data for Maharashtra">Rainfall data for Maharashtra</button>
+                <button class="chip" data-prompt="Groundwater extraction overview">Groundwater extraction overview</button>
+                <button class="chip" data-prompt="How to use INGRES?">How to use INGRES?</button>
+            </div>
+
+            <div class="chatbot__messages" id="chatMessages">
+                <div class="message message--bot">
+                    <div class="message__meta">
+                        <strong>INGRES Assistant</strong> <time class="message__time">now</time>
+                    </div>
+                    <div class="message__content">
+                        Welcome to INGRES (Integrated Groundwater Resource Information System)! I can help with state-wise groundwater
+                        statistics, rainfall patterns, water extraction figures, and general groundwater management guidance. Try a suggestion
+                        above or ask your own question.
+                    </div>
+                </div>
+            </div>
+
+            <div class="chatbot__input">
+                <textarea
+                    id="messageInput"
+                    placeholder="Ask about groundwater data, states, rainfall... (Enter to send, Shift+Enter for new line)"
+                    rows="1"
+                    aria-label="Your message"
+                ></textarea>
+                <button id="sendButton" class="btn btn--primary" aria-label="Send message">Send</button>
+            </div>
         </div>
+
+        <button class="fab" id="openChatbotBtn" title="Chat with INGRES" aria-label="Chat with INGRES">💬</button>
     </div>
 
-    <script>
-        const API_BASE_URL = 'http://localhost:8001';
-        let sessionId = generateSessionId();
-
-        function generateSessionId() {
-            return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        }
-
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
-        }
-
-        async function sendMessage() {
-            const input = document.getElementById('messageInput');
-            const message = input.value.trim();
-
-            if (!message) return;
-
-            // Add user message to chat
-            addMessage(message, 'user');
-            input.value = '';
-
-            // Disable send button
-            const sendButton = document.getElementById('sendButton');
-            sendButton.disabled = true;
-
-            // Add loading message
-            const loadingId = addMessage('Thinking...', 'bot', true);
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/query`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        query: message,
-                        session_id: sessionId,
-                        user_id: 'web_user'
-                    })
-                });
-
-                const data = await response.json();
-
-                // Remove loading message
-                document.getElementById(loadingId).remove();
-
-                // Add bot response
-                addBotMessage(data, message);
-
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById(loadingId).remove();
-                addMessage('Sorry, I encountered an error. Please try again.', 'bot');
-            } finally {
-                sendButton.disabled = false;
-            }
-        }
-
-        function addMessage(text, sender, isLoading = false) {
-            const messagesContainer = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            const messageId = 'msg_' + Date.now();
-            messageDiv.id = messageId;
-            messageDiv.className = `message ${sender}-message`;
-
-            if (isLoading) {
-                messageDiv.classList.add('loading');
-            }
-
-            const senderName = sender === 'user' ? 'You' : 'INGRES Assistant';
-            messageDiv.innerHTML = `<strong>${senderName}:</strong> ${text}`;
-
-            messagesContainer.appendChild(messageDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-            return messageId;
-        }
-
-        function addBotMessage(response, originalQuery) {
-            const messagesContainer = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message bot-message';
-
-            let sourcesHtml = '';
-            if (response.sources && response.sources.length > 0) {
-                sourcesHtml = `
-                    <div class="sources">
-                        <strong>Sources:</strong><br>
-                        ${response.sources.slice(0, 3).map(source =>
-                    `• ${source.type}: ${source.source_type || 'Database'} 
-                             ${source.relevance_score ? `(${(source.relevance_score * 100).toFixed(0)}% relevant)` : ''}`
-                ).join('<br>')}
-                    </div>
-                `;
-            }
-
-            messageDiv.innerHTML = `
-                <strong>INGRES Assistant:</strong> ${response.answer}
-                ${sourcesHtml}
-                <div class="feedback-buttons">
-                    <button class="feedback-btn thumb-up" onclick="giveFeedback('${originalQuery}', '${response.answer}', 5)">👍 Helpful</button>
-                    <button class="feedback-btn thumb-down" onclick="giveFeedback('${originalQuery}', '${response.answer}', 2)">👎 Not helpful</button>
-                </div>
-            `;
-
-            messagesContainer.appendChild(messageDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        async function giveFeedback(query, answer, rating) {
-            try {
-                await fetch(`${API_BASE_URL}/feedback`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        query: query,
-                        answer: answer,
-                        rating: rating,
-                        session_id: sessionId,
-                        user_id: 'web_user'
-                    })
-                });
-
-                console.log('Feedback submitted successfully');
-            } catch (error) {
-                console.error('Error submitting feedback:', error);
-            }
-        }
-
-        // Initialize with example queries
-        function addExampleQueries() {
-            const examples = [
-                "What is the rainfall data for Maharashtra?",
-                "Which states have the highest groundwater extraction?",
-                "How do I upload shapefile in INGRES?",
-                "Compare groundwater resources between Gujarat and Rajasthan"
-            ];
-
-            // Add example buttons or suggestions here if needed
-        }
-    </script>
+    <script src="./scripts.js" defer></script>
 </body>
 
 </html>
