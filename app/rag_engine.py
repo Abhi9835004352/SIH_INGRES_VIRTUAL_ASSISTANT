@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 
 class QueryProcessor:
     def __init__(self):
-        # Configure Gemini
         if settings.gemini_api_key:
             genai.configure(api_key=settings.gemini_api_key)
             self.gemini_model = genai.GenerativeModel("gemini-2.0-flash")
@@ -190,6 +189,11 @@ class QueryProcessor:
         if any(p in query_lower for p in farewell_patterns):
             return "farewell"
 
+        # Comparison patterns
+        comparison_patterns = ["compare", "vs", "versus", "between"]
+        if any(p in query_lower for p in comparison_patterns):
+            return "comparison"
+
         # Quantitative patterns
         quantitative_patterns = [
             "how much", "how many", "what is the value", "total", "average", 
@@ -232,8 +236,6 @@ class QueryProcessor:
                     logger.info(
                         f"Direct match found {len(state_data)} records for state: {state}"
                     )
-                    break
-
         # If still no results, do text search
         if not results:
             text_search_results = await db_manager.query_groundwater_data(

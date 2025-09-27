@@ -51,6 +51,8 @@ IMPORTANT INSTRUCTIONS:
 - If context shows data for a specific state, provide that state's information
 - Don't say "I don't have information" if the context clearly contains relevant data
 - When multiple data points exist for the same state, prioritize the most complete and recent dataset
+- For comparison queries, SEARCH THE ENTIRE CONTEXT for all relevant states/locations mentioned
+- If asked to compare multiple states/locations, ensure you find and present data for ALL requested entities
 
 CONTEXT DATA PROVIDED:
 {context}
@@ -58,7 +60,7 @@ CONTEXT DATA PROVIDED:
 USER QUERY: {question}
 
 
-Based on the context data above, provide a specific, helpful answer. If you see multiple data entries for the same location, use the most recent and complete data with actual non-zero values. Include exact numbers from the context in your response."""
+Based on the context data above, provide a specific, helpful answer. If you see multiple data entries for the same location, use the most recent and complete data with actual non-zero values. For comparison queries, make sure to extract and present data for ALL requested states/locations found in the context. Include exact numbers from the context in your response."""
         return ChatPromptTemplate.from_template(template)
 
     def create_rag_chain(self):
@@ -76,15 +78,24 @@ Based on the context data above, provide a specific, helpful answer. If you see 
         start_time = datetime.utcnow()
 
         try:
-            if not self.rag_chain:
-                return QueryResponse(
-                    answer="The system is not properly initialized. Please run data preprocessing first or check the configuration.",
-                    sources=[],
-                    confidence_score=0.0,
-                    response_time=(datetime.utcnow() - start_time).total_seconds(),
-                )
+            # Check if this is a comparison query that might need enhanced retrieval
+            is_comparison = any(keyword in request.query.lower() for keyword in 
+                              ['compare', 'comparison', 'between', 'vs', 'versus', 'and'])
             
-            answer = await self.rag_chain.ainvoke(request.query)
+            if is_comparison and self.retriever:
+                # For comparison queries, get more documents to ensure both entities are captured
+                enhanced_retriever = vector_store.vector_store.as_retriever(search_kwargs={"k": 12})
+                enhanced_chain = (
+                    {"context": enhanced_retriever, "question": RunnablePassthrough()}
+                    | self.prompt
+                    | self.llm
+                    | StrOutputParser()
+                )
+                answer = await enhanced_chain.ainvoke(request.query)
+            elif self.rag_chain:
+                answer = await self.rag_chain.ainvoke(request.query)
+            else:
+                answer = "The system is not properly initialized. Please run data preprocessing first or check the configuration."
 
             response_time = (datetime.utcnow() - start_time).total_seconds()
 

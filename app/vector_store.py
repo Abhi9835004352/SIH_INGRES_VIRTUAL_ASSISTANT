@@ -51,7 +51,8 @@ class VectorStoreManager:
     def as_retriever(self):
         """Return the vector store as a retriever."""
         if self.vector_store:
-            return self.vector_store.as_retriever()
+            # Increase k for better coverage in multi-entity queries
+            return self.vector_store.as_retriever(search_kwargs={"k": 8})
         return None
 
     def get_stats(self) -> Dict[str, Any]:
